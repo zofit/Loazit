@@ -2,9 +2,10 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Text;
+using ICSharpCode.SharpZipLib.Zip;
+using ICSharpCode.SharpZipLib.Zip.Compression;
 using JetBrains.Annotations;
 
 namespace Loazit
@@ -265,11 +266,12 @@ namespace Loazit
             Directory.CreateDirectory(metadataDirectory);
             File.WriteAllText(Path.Combine(metadataDirectory, "container.xml"), containerXml, Encoding.UTF8);
 
-            System.IO.Compression.ZipFile.CreateFromDirectory(
-                workingDirectory,
-                outputFilename,
-                CompressionLevel.Optimal,
-                false);
+            var zipFactory = new FastZip
+            {
+                CompressionLevel = Deflater.CompressionLevel.BEST_COMPRESSION,
+                UseZip64 = UseZip64.Off,
+            };
+            zipFactory.CreateZip(outputFilename, workingDirectory, true, ".*");
         }
     }
 }
